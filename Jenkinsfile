@@ -35,8 +35,8 @@ pipeline {
                 DB_PORT = '5432'
             }
             steps {
-                sh 'npm run migrate up'
-                sh 'npm start'
+         
+                sh 'node index.js'
             }
         }
     }
