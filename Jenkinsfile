@@ -64,6 +64,8 @@ pipeline {
             steps {
         sh "/usr/local/bin/docker rm -f ${container_name}" // Elimina el contenedor si existe
         sh "/usr/local/bin/docker run -d -p ${container_port}:80 --name ${container_name} ${image_name}:${tag_image}"
+        sh "kill $(lsof -t -i:4200)"
+
              sh 'ng s'
             }
         }
