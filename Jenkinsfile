@@ -1,53 +1,47 @@
 pipeline {
-  agent any
-
-  environment {
-    DOCKER_IMAGE = "my-app:${env.GIT_COMMIT}"
-    DB_USER = credentials('db-user')
-    DB_HOST = credentials('db-host')
-    DB_NAME = credentials('db-name')
-    DB_PASSWORD = credentials('db-password')
-    DB_PORT = credentials('db-port')
-  }
-
-  stages {
-    stage('Build') {
-      steps {
-        sh '/usr/local/bin/docker build --tag $DOCKER_IMAGE .'
-      }
+    agent any
+    environment {
+        POSTGRES_DB = 'my-app'
+        POSTGRES_USER = 'niiqow'
+        POSTGRES_PASSWORD = '2212'
+        
+        PATH = "${env.PATH}:/Users/niiqow/.nvm/versions/node/v18.12.1/bin"
     }
-
-    stage('Test') {
-      steps {
-        sh '/usr/local/bin/docker run --rm $DOCKER_IMAGE npm test'
-      }
-    }
-
-    stage('Deploy to Test') {
-      when {
-        branch 'develop'
-      }
-      steps {
-        withCredentials([string(credentialsId: 'ssh-key', variable: 'SSH_KEY')]) {
-          sh '''
-            ssh -o StrictHostKeyChecking=no -i $SSH_KEY user@test-server "docker stop my-app; docker rm my-app; docker pull $DOCKER_IMAGE; docker run --name my-app -d -p 80:3000 --env-file=env.list $DOCKER_IMAGE"
-          '''
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-      }
-    }
-
-    stage('Deploy to Production') {
-      when {
-        branch 'master'
-        changeset "origin/master"
-      }
-      steps {
-        withCredentials([string(credentialsId: 'ssh-key', variable: 'SSH_KEY')]) {
-          sh '''
-            ssh -o StrictHostKeyChecking=no -i $SSH_KEY user@prod-server "docker stop my-app; docker rm my-app; docker pull $DOCKER_IMAGE; docker run --name my-app -d -p 80:3000 --env-file=env.list $DOCKER_IMAGE"
-          '''
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
         }
-      }
+        stage('Lint') {
+            steps {
+                sh 'npm run lint'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'npm test'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+        stage('Deploy') {
+            environment {
+                DB_HOST = 'localhost'
+                DB_PORT = '5432'
+            }
+            steps {
+                sh 'npm run migrate up'
+                sh 'npm start'
+            }
+        }
     }
-  }
 }
