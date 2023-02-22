@@ -28,11 +28,7 @@ pipeline {
                 sh 'npm test'
             }
         }
-        stage('Build') {
-            steps {
-                sh 'npm run build'
-            }
-        }
+       
         stage('Deploy') {
             environment {
                 DB_HOST = 'localhost'
