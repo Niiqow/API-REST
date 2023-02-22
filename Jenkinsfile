@@ -8,8 +8,8 @@ pipeline {
         PATH = "${env.PATH}:/Users/niiqow/.nvm/versions/node/v18.12.1/bin"
     }
       parameters {
-    string(name: 'container_name', defaultValue: 'angular_+_api_rest', description: 'Nombre del contenedor de docker.')
-    string(name: 'image_name', defaultValue: 'angular_+_api_rest', description: 'Nombre de la imagene docker.')
+    string(name: 'container_name', defaultValue: 'APIREST', description: 'Nombre del contenedor de docker.')
+    string(name: 'image_name', defaultValue: 'APIREST', description: 'Nombre de la imagene docker.')
     string(name: 'tag_image', defaultValue: 'lts', description: 'Tag de la imagen de la página.')
     string(name: 'container_port', defaultValue: '90', description: 'Puerto que usa el contenedor')
   }
@@ -22,7 +22,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
-                sh "/usr/local/bin/docker build -t ${image_name}:${tag_image} --file dockerfile ."
+                sh "/usr/local/bin/docker build -t ${image_name}:${tag_image} --file Dockerfile ."
             }
         }
         stage('Lint') {
