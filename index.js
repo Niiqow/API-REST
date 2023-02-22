@@ -16,6 +16,8 @@ const { Pool } = require('pg');
 
 const pool = new Pool(dbConfig);
 
+console.log('develop branch')
+
 pool.connect((err) => {
   if (err) {
     console.error('Error al conectar a la base de datos:', err.stack);
