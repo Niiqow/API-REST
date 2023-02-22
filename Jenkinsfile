@@ -1,9 +1,9 @@
 pipeline {
     agent any
     environment {
-        POSTGRES_DB = 'my-app'
-        POSTGRES_USER = 'niiqow'
-        POSTGRES_PASSWORD = '2212'
+        DB_NAME = 'my-app'
+        DB_USER = 'niiqow'
+        DB_PASSWORD = '2212'
         
         PATH = "${env.PATH}:/Users/niiqow/.nvm/versions/node/v18.12.1/bin"
     }
