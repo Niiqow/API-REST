@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const taskRoutes = require('./src/routes/taskRoutes');
+const dbConfig = require('./dbConfig');
 
 const app = express();
 
@@ -13,13 +14,7 @@ app.use('/api', taskRoutes);
 
 const { Pool } = require('pg');
 
-const pool = new Pool({
-  user: 'niiqow',
-  host: 'localhost',
-  database: 'my-app',
-  password: '2212',
-  port: 5432,
-});
+const pool = new Pool(dbConfig);
 
 pool.connect((err) => {
   if (err) {
