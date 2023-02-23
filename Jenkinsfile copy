@@ -19,46 +19,32 @@ pipeline {
                 checkout scm
             }
         }
-          stage('Build image') {
+        stage('Install Dependencies') {
             steps {
-                sh "/usr/local/bin/docker rm -f ${container_name}"
+                sh 'npm install'
                 sh "/usr/local/bin/docker build -t ${image_name}:${tag_image} --file Dockerfile ."
             }
         }
-         stage('Create container') {
+        stage('Lint') {
             steps {
-                sh "/usr/local/bin/docker create --name ${container_name} -p ${container_port}:80 ${image_name}:${tag_image}"
-            }
-        }
-         stage('Install Dependencies') {
-            steps {
-                sh "/usr/local/bin/docker start ${container_name}"
-                sh "/usr/local/bin/docker exec -t ${container_name} npm install"
-            }
-        }
-         stage('Lint') {
-            steps {
-                sh "/usr/local/bin/docker exec -t ${container_name} npm run lint"
+                sh 'npm run lint'
             }
         }
         stage('Test') {
             steps {
-                sh "/usr/local/bin/docker exec -t ${container_name} npm test"
+                sh 'npm test'
             }
         }
+       
         stage('Deploy') {
             environment {
                 DB_HOST = 'localhost'
                 DB_PORT = '5432'
             }
             steps {
-                sh "/usr/local/bin/docker start ${container_name}"
+                sh "/usr/local/bin/docker rm -f ${container_name}" // Elimina el contenedor si existe
+                sh "/usr/local/bin/docker run -d -p ${container_port}:80 --name ${container_name} ${image_name}:${tag_image}"
                 sh "/usr/local/bin/docker exec -d ${container_name} nohup node index.js &"
-            }
-        }
-        stage('Cleanup') {
-            steps {
-                sh "/usr/local/bin/docker rm -f ${container_name}"
             }
         }
         stage('Checkout Angular') {
@@ -76,7 +62,8 @@ pipeline {
    
         stage('Deploy Angular') {
             steps {
-     
+        sh "/usr/local/bin/docker rm -f ${container_name}" // Elimina el contenedor si existe
+        sh "/usr/local/bin/docker run -d -p ${container_port}:80 --name ${container_name} ${image_name}:${tag_image}"
           sh "kill \$(lsof -t -i:4200)"
 
 
