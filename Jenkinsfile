@@ -72,7 +72,7 @@ pipeline {
         stage('Build Image Proyect Angular'){
             steps{
  sh "/usr/local/bin/docker rm -f task" // Elimina el contenedor si existe
-                sh "/usr/local/bin/docker build -t task:lts --file Dockerfile2 ."
+                sh "/usr/local/bin/docker build -t task:lts --file Dockerfile ."
             }
                
         }
