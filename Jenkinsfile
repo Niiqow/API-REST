@@ -48,7 +48,7 @@ pipeline {
         }
         stage('Deploy') {
             environment {
-                DB_HOST = 'localhost'
+                DB_HOST = '192.168.1.143'
                 DB_PORT = '5432'
             }
             steps {
