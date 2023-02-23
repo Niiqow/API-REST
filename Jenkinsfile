@@ -21,7 +21,7 @@ pipeline {
         }
           stage('Build image') {
             steps {
-                sh "/usr/local/bin/docker rm -f ${container_name}"
+                sh "/usr/local/bin/docker rm -f ${container_name}" // Elimina el contenedor si existe
                 sh "/usr/local/bin/docker build -t ${image_name}:${tag_image} --file Dockerfile ."
             }
         }
@@ -54,11 +54,6 @@ pipeline {
             steps {
                 sh "/usr/local/bin/docker start ${container_name}"
                 sh "/usr/local/bin/docker exec -d ${container_name} nohup node index.js &"
-            }
-        }
-        stage('Cleanup') {
-            steps {
-                sh "/usr/local/bin/docker rm -f ${container_name}"
             }
         }
         stage('Checkout Angular') {
