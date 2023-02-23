@@ -11,7 +11,7 @@ pipeline {
     string(name: 'container_name', defaultValue: 'apirest', description: 'Nombre del contenedor de docker.')
     string(name: 'image_name', defaultValue: 'apirest', description: 'Nombre de la imagene docker.')
     string(name: 'tag_image', defaultValue: 'lts', description: 'Tag de la imagen de la página.')
-    string(name: 'container_port', defaultValue: '8081', description: 'Puerto que usa el contenedor')
+    string(name: 'container_port', defaultValue: '3000', description: 'Puerto que usa el contenedor')
   }
     stages {
         stage('Checkout') {
@@ -27,7 +27,7 @@ pipeline {
         }
          stage('Create container') {
             steps {
-                sh "/usr/local/bin/docker create --name ${container_name} -p ${container_port}:80 ${image_name}:${tag_image}"
+                sh "/usr/local/bin/docker create --name ${container_name} -p ${container_port}:3000 ${image_name}:${tag_image}"
             }
         }
          stage('Install Dependencies') {
