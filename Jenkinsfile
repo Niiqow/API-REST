@@ -1,6 +1,8 @@
 pipeline {
     agent any
     environment {
+        DB_HOST = '192.168.1.143'
+        DB_PORT = '5432'
         DB_NAME = 'my-app'
         DB_USER = 'niiqow'
         DB_PASSWORD = '2212'
@@ -19,10 +21,12 @@ pipeline {
                 checkout scm
             }
         }
-          stage('Build image') {
+          stage('Build image API REST') {
             steps {
                 sh "/usr/local/bin/docker rm -f ${container_name}" // Elimina el contenedor si existe
                 sh "/usr/local/bin/docker build -t ${image_name}:${tag_image} --file Dockerfile ."
+                
+
             }
         }
          stage('Create container') {
@@ -47,25 +51,47 @@ pipeline {
             }
         }
         stage('Deploy') {
-            environment {
-                DB_HOST = '192.168.1.143'
-                DB_PORT = '5432'
-            }
-            steps {
-                sh "/usr/local/bin/docker start ${container_name}"
-                sh "/usr/local/bin/docker exec -d ${container_name} nohup node index.js &"
-            }
-        }
+    steps {
+        sh "/usr/local/bin/docker start ${container_name}"
+        sh "sleep 10" // esperar 10 segundos para asegurarse que el contenedor esté completamente iniciado
+        sh '/usr/local/bin/docker run -d --net="host" apirest:lts'
+        sh "sleep 10" // esperar 10 segundos para asegurarse que el contenedor esté completamente iniciado
+        sh "/usr/local/bin/docker exec -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_NAME=${DB_NAME} -e DB_USER=${DB_USER} -e DB_PASSWORD=${DB_PASSWORD} ${container_name} node index.js&"
+
+        sh "/usr/local/bin/docker logs ${container_name}"
+    }
+}
+
         stage('Checkout Angular') {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Niiqow/my-app.git']]])
             }
         }
+        
+
+        stage('Build Image Proyect Angular'){
+            steps{
+ sh "/usr/local/bin/docker rm -f task" // Elimina el contenedor si existe
+                sh "/usr/local/bin/docker build -t task:lts --file Dockerfile2 ."
+            }
+               
+        }
+
+          stage('Create container Angular') {
+            steps {
+                sh "/usr/local/bin/docker create --name task -p 4200:4200 task:lts"
+            }
+        }
+
         stage('Install Angular Dependencies') {
             steps {
-                
-                sh 'npm install'
-                sh 'npm install -g @angular/cli'
+               
+               
+            
+
+                sh "/usr/local/bin/docker start task"
+                sh "/usr/local/bin/docker exec -t task npm install"
+                  sh "/usr/local/bin/docker exec -t task npm install -g @angular/cli"
             }
         }
    
@@ -75,7 +101,7 @@ pipeline {
           sh "kill \$(lsof -t -i:4200)"
 
 
-             sh 'ng s'
+           sh "/usr/local/bin/docker exec -t task ng s"
             }
         }
     }
