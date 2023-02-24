@@ -8,6 +8,7 @@ pipeline {
         DB_PASSWORD = '2212'
         
         PATH = "${env.PATH}:/Users/niiqow/.nvm/versions/node/v18.12.1/bin"
+        
     }
       parameters {
     string(name: 'container_name', defaultValue: 'apirest', description: 'Nombre del contenedor de docker.')
@@ -71,38 +72,33 @@ pipeline {
 
         stage('Build Image Proyect Angular'){
             steps{
- sh "/usr/local/bin/docker rm -f task" // Elimina el contenedor si existe
-                sh "/usr/local/bin/docker build -t task:lts --file Dockerfile ."
+            sh "if lsof -Pi :4200 -sTCP:LISTEN -t >/dev/null ; then kill \$(lsof -t -i:4200); fi"
+            sh "/usr/local/bin/docker rm -f task" // Elimina el contenedor si existe
+            sh "/usr/local/bin/docker create --name task -p 4200:4200 task:lts" // Crea el contenedor
+           
+ 
+               
             }
                
         }
 
-          stage('Create container Angular') {
-            steps {
-                sh "/usr/local/bin/docker create --name task -p 4200:4200 task:lts"
-            }
-        }
+        
 
-        stage('Install Angular Dependencies') {
-            steps {
-               
-               
-            
 
-                sh "/usr/local/bin/docker start task"
-                sh "/usr/local/bin/docker exec -t task npm install"
-                  sh "/usr/local/bin/docker exec -t task npm install -g @angular/cli"
-            }
-        }
-   
-        stage('Deploy Angular') {
-            steps {
+stage('Build Angular App') {
+    steps {
      
-          sh "kill \$(lsof -t -i:4200)"
-
-
-           sh "/usr/local/bin/docker exec -t task ng s"
-            }
-        }
+       sh "/usr/local/bin/docker start task"
+        sh "/usr/local/bin/docker build -t task:lts --file Dockerfile ."
+      
+    }
+}
+stage('Run Docker Container') {
+    steps {
+        sh "if ! /usr/local/bin/docker ps -q -f name=task > /dev/null; then \
+            /usr/local/bin/docker run -d --name task -p 4200:4200 -v ${WORKSPACE}/dist:/usr/share/nginx/html:ro nginx:alpine; \
+            fi"
+    }
+}
     }
 }
