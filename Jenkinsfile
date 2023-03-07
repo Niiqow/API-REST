@@ -13,7 +13,7 @@ pipeline {
     string(name: 'container_name', defaultValue: 'apirest', description: 'Nombre del contenedor de docker.')
     string(name: 'image_name', defaultValue: 'apirest', description: 'Nombre de la imagene docker.')
    string(name: 'tag_image', defaultValue: "tag-${new Date().format('yyyyMMddHHmmss')}", description: 'Tag de la imagen de la página.')
-    string(name: 'container_port', defaultValue: '3000', description: 'Puerto que usa el contenedor')
+    string(name: 'container_port', defaultValue: '8080', description: 'Puerto que usa el contenedor')
   }
     stages {
         stage('Checkout') {
