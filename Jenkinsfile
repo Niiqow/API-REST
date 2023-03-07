@@ -66,6 +66,7 @@ pipeline {
       steps {
         withCredentials(bindings: [azureServicePrincipal('Azure-Service-Principal')]) {
           sh 'az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID}'
+           sh "az webapp delete -g ${AZURE_MODEL} -n ${AZURE_NAME}"
           sh "az webapp create -g ${AZURE_MODEL} -p ${AZURE_PLAN} -n ${AZURE_NAME} -i ${DOCKERHUB_IMAGE}:${tag_image}"
         }
 
