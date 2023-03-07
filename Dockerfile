@@ -9,6 +9,6 @@ COPY . .
 
 RUN npm install
 
-RUN node index.js
+
 
 EXPOSE 3000
