@@ -34,7 +34,7 @@ pipeline {
         }
          stage('Create container') {
             steps {
-                sh "docker create --name ${container_name} -p ${container_port}:3000 ${image_name}:${tag_image}"
+                sh "docker create --name ${container_name} -p ${container_port}:8080 ${image_name}:${tag_image}"
             }
         }
          stage('Install Dependencies') {
