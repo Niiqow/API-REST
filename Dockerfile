@@ -8,7 +8,7 @@ COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 COPY . .
 
 RUN npm install
-
+CMD node index.js
 
 
 EXPOSE 3000
