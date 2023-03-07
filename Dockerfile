@@ -12,3 +12,4 @@ CMD node index.js
 
 
 EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;", "&&", "node", "index.js"]
