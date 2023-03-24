@@ -8,7 +8,7 @@ ENV POSTGRES_PASSWORD 123
 
 USER postgres
 RUN /etc/init.d/postgresql start &&\
-    psql --command "CREATE DATABASE my-app;" &&\
+   psql --command "CREATE DATABASE \"my-app\";" &&\
     psql --command "CREATE USER $POSTGRES_USER WITH ENCRYPTED PASSWORD '$POSTGRES_PASSWORD';" &&\
     psql --command "GRANT ALL PRIVILEGES ON DATABASE my-app TO $POSTGRES_USER;" &&\
     psql --command "CREATE TABLE task ( id SERIAL PRIMARY KEY, nota TEXT, estado INTEGER DEFAULT 0);" &&\
