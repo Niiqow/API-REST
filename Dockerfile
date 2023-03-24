@@ -1,6 +1,9 @@
 FROM nginx:latest
 
-RUN apt-get update && apt-get install -y nodejs npm postgresql postgresql-contrib
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends nodejs npm postgresql postgresql-contrib && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Crear un usuario y una contraseña de PostgreSQL
 ENV POSTGRES_USER myuser
