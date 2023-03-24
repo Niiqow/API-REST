@@ -28,7 +28,7 @@ pipeline {
     }
           stage('Build image API REST') {
             steps {
-                 sh "docker rm -f apirest"
+      
                 sh "docker build -t ${image_name}:${tag_image} --file Dockerfile ."
             }
         }
@@ -60,6 +60,7 @@ pipeline {
         sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password dckr_pat_gVpdHEJnxmBIia7tHyILm6zS05c'
         sh "docker tag ${image_name}:${tag_image} ${DOCKERHUB_IMAGE}:${tag_image}"
         sh "docker push ${DOCKERHUB_IMAGE}:${tag_image}"
+        sh "docker rmi ${DOCKERHUB_IMAGE}:${tag_image}"
       }
     }
      stage('Deploy to Azure App Service') {
