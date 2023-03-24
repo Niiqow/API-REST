@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y nodejs npm postgresql postgresql-contri
 
 USER postgres
 RUN /etc/init.d/postgresql start &&\
-    psql --command "CREATE USER myuser WITH SUPERUSER PASSWORD 'mypassword';" &&\
+    psql --command "CREATE USER myuser WITH SUPERUSER PASSWORD '123';" &&\
     createdb -O myuser mydb
 
 WORKDIR /usr/share/nginx/html
