@@ -5,10 +5,12 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Crear un usuario y una contraseña de PostgreSQL
-ENV POSTGRES_USER myuser
-ENV POSTGRES_PASSWORD 123
 
+
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY . .
+RUN npm install
 USER postgres
 RUN /etc/init.d/postgresql start &&\
     psql --command "CREATE USER myuser WITH SUPERUSER PASSWORD '123';" &&\
@@ -16,11 +18,6 @@ RUN /etc/init.d/postgresql start &&\
     psql -d my-app -c "CREATE TABLE task (id SERIAL PRIMARY KEY, nota TEXT, estado INTEGER DEFAULT 0);" &&\
     psql -d my-app -c "INSERT INTO task (nota) VALUES ('Tarea 1');"
 WORKDIR /usr/share/nginx/html
-
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-COPY . .
-
-
 CMD node index.js
 
 
